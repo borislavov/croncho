@@ -1,0 +1,12 @@
+{
+ "crons": [
+     {
+	 "date_time_rule": "cron like date time # m h dom mon dow",
+	 "job": "/usr/bin/echo",
+     },
+     {
+	 "date_time_rule": "cron like date time # m h dom mon dow",
+	 "job": "/usr/bin/echo",
+     }
+ ]
+}

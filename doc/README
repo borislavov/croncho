@@ -1,0 +1,86 @@
+Croncho
+
+A Perl based Cron Scheduler.
+
+Croncho is Perl script/daemon that has Cron-like capabilities. It
+fetches JSON data with Cron rules on specified periods and converts
+them into Cron file. The scheduler then executes the Cron file rules
+in the specified times.
+
+The Ugly
+
+There is not good enough Perl module to schedule Cron rules. The
+closes thing is Schedule::Cron. The problem is that it either works as
+background (forked) daemon process or never exits. The forked mode is
+preferred and used. This requires this process to be killed later. 
+
+The idea behind Croncho is to be executed as a Cron job every
+minute. This requires the Croncho Cron Scheduler (Perl process) to be
+killed on every new spawning by the Cron job.
+
+This is problematic since when the previous process is killed it might
+kill some Cron jobs that are run in that moment. It seems there is no
+way to overcome this.
+
+Installation
+
+ tar -xzf croncho-vX.Y.tar.gz
+ chmod +x /usr/local/icn/croncho/bin/croncho.pl
+
+ cp -r croncho-vX.Y/ /usr/local/icn/croncho
+
+ Add the Cron rule from the doc/examples/croncho.cron to the Cron rules.
+
+Required Perl modules
+
+  LWP::UserAgent;
+  Schedule::Cron;
+  Config::Simple;
+  JSON;
+  POSIX;
+  File::Copy;
+
+Config file format
+See etc/examples/croncho.conf as well.
+
+	# Server type
+	# 1 cPanel
+	# 2 ICN.bg Equipment
+	# 3 Custom 
+	server_type: 1
+
+	# Log file
+	log_file: /var/log/croncho/croncho.log
+
+	# The file where all Cron rules will saved and executed from
+	cron_file: /usr/local/icn/etc/croncho.cron
+
+	# The URL from where the cron rules will be fetched.
+	cron_repository: http://IP.ADDRESS/croncho/crons.json
+
+	# The day of week when the new Cron rules should be fetched
+	# Thu, Thuesday, 1-7 (1 Monday)
+	cron_fetch_day: Fri
+	# The time when the new Cron rules should be fetched. 24-hour format
+	cron_fetch_time: 10:51
+
+	# The PID file of the Cron schedule
+	cron_pid_file: /var/run/croncho.pid
+
+
+JSON Cron data format.
+
+See docs/examples/cron_sample.json as well.
+
+     {
+      "crons": [
+      {
+	"date_time": "*/1  * * * *",
+       	"job": "/bin/date"
+      },
+      {
+       "date_time": "*/2 * * * *",
+        "job": "/bin/echo 123"
+      }
+    ]
+   }
